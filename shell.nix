@@ -1,3 +1,5 @@
+{ ghcVersion ? "ghc90"
+} :
 let
   pkgs =
     import (builtins.fetchTarball {
@@ -13,7 +15,7 @@ let
 in
 pkgs.mkShell {
   nativeBuildInputs = [
-    pkgs.haskell.compiler.ghc90
+    pkgs.haskell.compiler.${ghcVersion}
     pkgs.cabal-install
     pkgs.git
     pkgs2405.gcc9 # later versions fail with issue https://github.com/jberthold/packman/issues/17

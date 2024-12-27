@@ -9,6 +9,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-22.04, ubuntu-20.04, macos-13]
+        ghc: [ghc88, ghc96, ghc810, ghc884 or ghc90]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -30,7 +31,7 @@ jobs:
             ~/.cabal/packages
             ~/.cabal/store
             dist-newstyle
-          key: ${{ runner.os }}-${{ matrix.os }}-${{ hashFiles('**/*.cabal', '**/cabal.project', '**/cabal.project.freeze') }}
+          key: ${{ runner.os }}-${{ matrix.os }}-${{ hashFiles('**/*.cabal', '**/cabal.project', '**/cabal.project.freeze') }}--${{ matrix.ghc }}
           restore-keys: ${{ runner.os }}-${{ matrix.os }}-
 
       # Make nix-shell use specific Bash version.
@@ -39,16 +40,16 @@ jobs:
         run: echo "NIX_BUILD_SHELL=$(nix-build -A bash .github/workflows/bash.nix)/bin/bash" >> $GITHUB_ENV
 
       - name: Test nix-shell # test that the Nix shell actually works
-        run: nix-shell --run 'echo $PATH; ls -l $(which ghc); ls -l $(which cabal); ghc --version; cabal --version; type cabal'
+        run: nix-shell --run --argstr ghcVersion ${{ matrix.ghc }} 'echo $PATH; ls -l $(which ghc); ls -l $(which cabal); ghc --version; cabal --version; type cabal'
 
       - name: Run 'cabal update'
-        run: nix-shell --run 'cabal update'
+        run: nix-shell --run --argstr ghcVersion ${{ matrix.ghc }} 'cabal update'
 
       - name: Build library
-        run: nix-shell --run 'cabal build lib:packman'
+        run: nix-shell --run --argstr ghcVersion ${{ matrix.ghc }} 'cabal build lib:packman'
 
       - name: Build tests
-        run: nix-shell --run 'cabal build --enable-tests'
+        run: nix-shell --run --argstr ghcVersion ${{ matrix.ghc }} 'cabal build --enable-tests'
 
       - name: Run tests
-        run: nix-shell --run 'cabal test --test-show-details direct' # "--test-show-details direct" makes cabal print test suite output to terminal
+        run: nix-shell --run --argstr ghcVersion ${{ matrix.ghc }} 'cabal test --test-show-details direct' # "--test-show-details direct" makes cabal print test suite output to terminal
