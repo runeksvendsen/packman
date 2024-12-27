@@ -33,6 +33,11 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.os }}-${{ hashFiles('**/*.cabal', '**/cabal.project', '**/cabal.project.freeze') }}
           restore-keys: ${{ runner.os }}-${{ matrix.os }}-
 
+      # Make nix-shell use specific Bash version.
+      # Cf. https://nixos.org/manual/nix/stable/command-ref/nix-shell#environment-variables.
+      - name: Set shell Bash
+        run: echo "NIX_BUILD_SHELL=$(nix-build -A bash .github/workflows/bash.nix)/bin/bash" >> $GITHUB_ENV
+
       - name: Test nix-shell # test that the Nix shell actually works
         run: nix-shell --run 'echo $PATH; ls -l $(which ghc); ls -l $(which cabal); ghc --version; cabal --version; type cabal'
 
