@@ -13,7 +13,7 @@ let
 in
 pkgs.mkShell {
   nativeBuildInputs = [
-    pkgs.haskell.compiler.ghc88
+    pkgs.haskell.compiler.ghc90
     pkgs.cabal-install
     pkgs.git
     pkgs2405.gcc9 # later versions fail with issue https://github.com/jberthold/packman/issues/17
