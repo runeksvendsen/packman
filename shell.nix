@@ -5,10 +5,10 @@ let
       sha256 = "10wn0l08j9lgqcw8177nh2ljrnxdrpri7bp0g7nvrsn9rkawvlbf";
     }) {};
 
-  pkgsGcc =
+  pkgs2405 =
     import (builtins.fetchTarball {
-      url = "https://github.com/NixOS/nixpkgs/archive/release-24.05.tar.gz";
-      sha256 = "0asfn6clphn8gb0d17l6mc4yxwc3xr41hndq2s49wyl5siyi1730";
+      url = "https://github.com/NixOS/nixpkgs/archive/31ac92f9628682b294026f0860e14587a09ffb4b.tar.gz";
+      sha256 = "0qbyywfgjljfb4izdngxvbyvbrkilmpsmmx2a9spbwir2bcmbi14";
     }) {};
 in
 pkgs.mkShell {
@@ -16,7 +16,7 @@ pkgs.mkShell {
     pkgs.haskell.compiler.ghc88
     pkgs.cabal-install
     pkgs.git
-    pkgsGcc.gcc9 # later versions fail with issue https://github.com/jberthold/packman/issues/17
+    pkgs2405.gcc9 # later versions fail with issue https://github.com/jberthold/packman/issues/17
   ];
 }
 
