@@ -54,3 +54,7 @@ jobs:
 
       - name: Run tests
         run: nix-shell --argstr ghcVersion ${{ matrix.ghc }} --run 'cabal test --test-show-details direct' # "--test-show-details direct" makes cabal print test suite output to terminal
+
+      - name: Run failed tests
+        if: failure()
+        run: nix-shell --argstr ghcVersion ${{ matrix.ghc }} --run 'cabal test --test-show-details failures'
