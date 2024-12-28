@@ -7,6 +7,7 @@ on:
 jobs:
   build_test:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-22.04, ubuntu-20.04, macos-13]
         ghc: [ghc88, ghc96, ghc810, ghc884, ghc90]
