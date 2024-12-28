@@ -7,6 +7,7 @@ on:
 jobs:
   build_test:
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-22.04, ubuntu-20.04, macos-13]
         ghc: [ghc7103, ghc802, ghc822, ghc844, ghc865Binary, ghc884, ghc810, ghc90, ghc92, ghc94, ghc96]
@@ -53,3 +54,7 @@ jobs:
 
       - name: Run tests
         run: nix-shell --argstr ghcVersion ${{ matrix.ghc }} --run 'cabal test --test-show-details direct' # "--test-show-details direct" makes cabal print test suite output to terminal
+
+      - name: Run failed tests
+        if: failure()
+        run: nix-shell --argstr ghcVersion ${{ matrix.ghc }} --run 'cabal test --test-show-details failures'
