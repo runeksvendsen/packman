@@ -1,4 +1,5 @@
 { ghcVersion ? "ghc90"
+, ccVersion ? "gcc9"
 } :
 let
   pkgs =
@@ -26,7 +27,7 @@ pkgs.mkShell {
     ghc
     pkgs.cabal-install
     pkgs.git
-    pkgs2405.gcc9 # later versions fail with issue https://github.com/jberthold/packman/issues/17
+    pkgs2405.${ccVersion}
   ];
 }
 

@@ -11,6 +11,7 @@ jobs:
       matrix:
         os: [ubuntu-22.04, ubuntu-20.04, macos-13]
         ghc: [ghc7103, ghc802, ghc822, ghc844, ghc865Binary, ghc884, ghc810, ghc90, ghc92, ghc94, ghc96]
+        cc: [gcc8, gcc9, gcc10, gcc11, gcc12, gcc13, gcc14, clang_12, clang_13, clang_14, clang_15, clang_16, clang_18]
         exclude:
           # GHC version >= 7.10 and <= 8.4 are provided by a version of nixpkgs that is broken for macos-13 (cf. https://github.com/NixOS/nixpkgs/issues/104580)
           - os: macos-13
@@ -51,23 +52,23 @@ jobs:
         run: echo "NIX_BUILD_SHELL=$(nix-build -A bash .github/workflows/bash.nix)/bin/bash" >> $GITHUB_ENV
 
       - name: Test nix-shell # test that the Nix shell actually works
-        run: nix-shell --argstr ghcVersion ${{ matrix.ghc }} --run 'echo $PATH; ls -l $(which ghc); ls -l $(which cabal); ghc --version; cabal --version; type cabal'
+        run: nix-shell --argstr ghcVersion ${{ matrix.ghc }} --argstr ccVersion ${{ matrix.cc }} --run 'echo $PATH; ls -l $(which ghc); ls -l $(which cabal); ghc --version; cabal --version; type cabal'
 
       - name: Export GHC version env var
-        run: echo "GHC_VERSION=$(nix-shell --argstr ghcVersion ${{ matrix.ghc }} --run 'ghc --numeric-version')" >> $GITHUB_ENV
+        run: echo "GHC_VERSION=$(nix-shell --argstr ghcVersion ${{ matrix.ghc }} --argstr ccVersion ${{ matrix.cc }} --run 'ghc --numeric-version')" >> $GITHUB_ENV
 
       - name: Run 'cabal update'
-        run: nix-shell --argstr ghcVersion ${{ matrix.ghc }} --run 'cabal update'
+        run: nix-shell --argstr ghcVersion ${{ matrix.ghc }} --argstr ccVersion ${{ matrix.cc }} --run 'cabal update'
 
       - name: Build library
-        run: nix-shell --argstr ghcVersion ${{ matrix.ghc }} --run 'cabal build lib:packman'
+        run: nix-shell --argstr ghcVersion ${{ matrix.ghc }} --argstr ccVersion ${{ matrix.cc }} --run 'cabal build lib:packman'
 
       - name: Build tests
-        run: nix-shell --argstr ghcVersion ${{ matrix.ghc }} --run 'cabal build --enable-tests'
+        run: nix-shell --argstr ghcVersion ${{ matrix.ghc }} --argstr ccVersion ${{ matrix.cc }} --run 'cabal build --enable-tests'
 
       - name: Run tests
-        run: nix-shell --argstr ghcVersion ${{ matrix.ghc }} --run 'cabal test --test-show-details direct' # "--test-show-details direct" makes cabal print test suite output to terminal
+        run: nix-shell --argstr ghcVersion ${{ matrix.ghc }} --argstr ccVersion ${{ matrix.cc }} --run 'cabal test --test-show-details direct' # "--test-show-details direct" makes cabal print test suite output to terminal
 
       - name: Run failed tests
         if: failure()
-        run: nix-shell --argstr ghcVersion ${{ matrix.ghc }} --run 'cabal test --test-show-details failures'
+        run: nix-shell --argstr ghcVersion ${{ matrix.ghc }} --argstr ccVersion ${{ matrix.cc }} --run 'cabal test --test-show-details failures'
