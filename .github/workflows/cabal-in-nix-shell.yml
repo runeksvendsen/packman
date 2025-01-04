@@ -13,7 +13,7 @@ jobs:
         ghc: [ghc7103, ghc802, ghc822, ghc844, ghc865Binary, ghc884, ghc810, ghc90, ghc92, ghc94, ghc96]
         cc: [gcc8, gcc12, gcc14, clang_12, clang_16, clang_18]
         exclude:
-          # GHC version >= 7.10 and <= 8.4 are provided by a version of nixpkgs that is broken for macOS (cf. https://github.com/NixOS/nixpkgs/issues/104580)
+          # GHC version >= 7.10 and <= 8.4 are provided by a version of nixpkgs that is broken for macOS (cf. https://github.com/NixOS/nixpkgs/issues/104580) so we exlude these
           - os: macos-13
             ghc: ghc7103
           - os: macos-13
@@ -39,6 +39,7 @@ jobs:
         uses: cachix/install-nix-action@v25
         with:
           install_url: https://releases.nixos.org/nix/nix-2.20.5/install
+          # NOTE: We avoid using arm64 builds of GHC (because they're mostly broken for early GHC versions) by specifying 'system = x86_64-darwin' for macOS runners
           extra_nix_config: |
             substituters = https://cache.nixos.org https://cache.iog.io
             trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ=
