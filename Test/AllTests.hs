@@ -1,7 +1,7 @@
 {-
   Some tests to verify that serialisation works as expected
 -}
-module AllTests(tests)
+module Main(main)
     where
 
 import GHC.Packing
@@ -17,6 +17,8 @@ import Control.Exception
 import Data.Typeable
 
 import Distribution.TestSuite
+import Control.Monad (forM_, forM, unless)
+import qualified System.Exit
 
 -- this test uses the trySerialize routine. We expect to trigger some
 -- exceptions and catch them as appropriate.
@@ -36,8 +38,8 @@ nfib n = let n1 = nfib (n-1)
 runIt :: String -> IO Bool -> TestInstance
 runIt name action
     = TestInstance
-        { run = action >>= return . Finished . 
-                           (\b -> if b then Pass 
+        { run = action >>= return . Finished .
+                           (\b -> if b then Pass
                                   else Fail "unexpected output (see log)")
         , name = "Test case " ++ name
         , tags = []
@@ -52,10 +54,24 @@ tests = do putStrLn "Running all tests"
 -- all configured tests, see below
 mytests = [eval_array, pack_array, pack_ThreadId, pack_MVar ]
 
+main :: IO ()
+main = do
+    putStrLn "Running all tests"
+    results <- forM mytests runTest
+    unless (and results) $ do
+        putStrLn "Some tests failed (see output above)"
+        System.Exit.exitFailure
+    where
+        runTest (name, action) = do
+            putStrLn $ "Running test '" ++ name ++ "'..."
+            b <- action
+            putStrLn $ (if b then "PASS: " else "FAIL: ") ++ name
+            return b
+
 -- test data
 arr, output :: A.Array Int Int
 arr  = A.array (0,127) [ (i,i) | i <- [0..127] ]
-output = A.amap (2*) arr 
+output = A.amap (2*) arr
 
 n :: Int
 n = 3
