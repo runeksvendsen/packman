@@ -30,6 +30,13 @@ jobs:
             ghc: ghc822
           - os: macos-14
             ghc: ghc844
+          # ARM is broken for GHC < 8.10
+          - os: macos-14
+            ghc: ghc884
+          - os: macos-14
+            ghc: ghc865Binary
+          - os: macos-14
+            ghc: ghc844
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
